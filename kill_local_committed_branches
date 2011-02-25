@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+require 'open3'
+
+def system_puts(command)
+  puts command
+  system command
+end
+
+branches = `git branch`.split("\n")
+current_branch = branches.select{|l| l =~ /^\*/}.first.gsub("\* ", "")
+raise "Should not run this when not in master" unless current_branch == 'master'
+(branches - ["* master"]).each do |branch|
+  system_puts("git checkout #{branch}")
+  system_puts("git pull")
+  Open3.popen3("git status") do |i,o,e|
+    if o.readlines.include?("nothing to commit (working directory clean)\n")
+      system_puts("git checkout master")
+      system_puts("git branch -d #{branch}")
+    else
+      system_puts("git checkout master")
+      puts("****** #{branch} could not be deleted due to uncommitted changes")
+    end
+  end
+end

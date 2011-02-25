@@ -1,0 +1,15 @@
+#!/usr/bin/env ruby
+
+RUN_ALL = 'run_all'
+args="git pull && git fetch --all && git fetch -t"
+
+type=`type #{RUN_ALL} 2>/dev/null`
+command = if $?.to_i.zero?
+  type.split[2]
+elsif File.exists?("./#{RUN_ALL}")
+  "./#{RUN_ALL}"
+else
+  abort "#{RUN_ALL} not found in PATH or current directory."
+end
+
+system("#{command} \"#{args}\"")

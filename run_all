@@ -1,0 +1,21 @@
+#!/bin/bash
+
+DIRECTORIES=`ls -1d */.git/ | cut -d/ -f1`
+TOTAL_COUNT=`echo $DIRECTORIES | wc -w`
+
+date
+
+count=1
+for dir in $DIRECTORIES; do
+  if [ -d $dir -a ! -h $dir ]; then
+    tput setf 4
+    echo ">>>>>>>>>>>>>>>>>>>>> [$count of $TOTAL_COUNT]  "$*" (in $dir) <<<<<<<<<<<<<<<<<<<<"
+    tput sgr0
+    cd $dir
+    bash -c "$*"
+    cd ..
+    let count=count+1
+  fi
+done
+
+date
