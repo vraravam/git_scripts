@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+require File.expand_path('./kernel_override', File.dirname(__FILE__)) if ARGV.include?("-v")
+
 RUN_ALL = 'run_all'
 args="git status"
 
