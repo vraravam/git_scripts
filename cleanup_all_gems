@@ -2,6 +2,6 @@
 
 require File.expand_path('./kernel_override', File.dirname(__FILE__)) if ARGV.include?("-v")
 
-system("gem list | cut -d' ' -f1 | xargs gem uninstall -aIx")
+system("gem list | cut -d' ' -f1 | grep -v rake | grep -v bundler | grep -v passenger | grep -v fastthread | grep -v daemon_controller | xargs gem uninstall -aIx")
 system("gem install rake bundler")
 system("bundle") if File.exists?("./Gemfile")
