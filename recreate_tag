@@ -1,18 +1,29 @@
 #!/usr/bin/env ruby
 
+verbose = ARGV.delete("-v")
+tag_to_recreate = ARGV.first
+raise "Should specify tag to recreate: usage: #{$0} [-v] <tag>" if tag_to_recreate.nil?
+
 require 'open3'
-require File.expand_path('./kernel_override', File.dirname(__FILE__)) if ARGV.include?("-v")
+require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
 
 branches = `git branch`.split("\n")
 current_branch = branches.detect{|l| l =~ /^\*/}.gsub("\* ", "")
 raise "Should not run this when in master" if current_branch == 'master'
+
 tags = `git tag -l`.split("\n")
 tags_for_current_branch = tags.select{|l| l =~ /^#{current_branch}/}
+raise "Cannot recreate a non-existent tag: #{tag_to_recreate.inspect}" unless tags_for_current_branch.include?(tag_to_recreate)
+
 latest_tag = tags_for_current_branch.sort{|a,b| a.split('.').collect(&:to_i) <=> b.split('.').collect(&:to_i)}.last
+raise "Cannot recreate anything other than the latest tag: latest: #{latest_tag.inspect}" if latest_tag != tag_to_recreate
+
 diff_exists = `git diff #{current_branch}..#{latest_tag}`
+puts diff_exists
+
 if !diff_exists.empty?
-  `git tag -d #{latest_tag}`
-  `git push origin :refs/tags/#{latest_tag}`
-  `git tag #{latest_tag}`
-  `git push --tags`
+  system("git tag -d #{latest_tag}")
+  system("git push origin :refs/tags/#{latest_tag}")
+  system("git tag #{latest_tag}")
+  system("git push --tags")
 end
