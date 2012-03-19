@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+verbose = ARGV.delete("-v")
+branch_to_recreate = ARGV.first
+raise "Should specify branch to recreate: usage: #{$0} [-v] <branch>" if branch_to_recreate.nil?
+
+require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
+
+branches = `git branch`.split("\n")
+current_branch = branches.detect{|l| l =~ /^\*/}.gsub("\* ", "")
+raise "Should run this only when in master" if current_branch != 'master'
+
+system("git branch -la && git branch -D #{branch_to_recreate} && git push origin :#{branch_to_recreate} && git branch -la && git branch #{branch_to_recreate} && git push origin #{branch_to_recreate} && git branch -d #{branch_to_recreate} && git co #{branch_to_recreate} && git co master")

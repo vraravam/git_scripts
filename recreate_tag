@@ -4,7 +4,6 @@ verbose = ARGV.delete("-v")
 tag_to_recreate = ARGV.first
 raise "Should specify tag to recreate: usage: #{$0} [-v] <tag>" if tag_to_recreate.nil?
 
-require 'open3'
 require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
 
 branches = `git branch`.split("\n")
