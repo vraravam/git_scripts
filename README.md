@@ -12,12 +12,18 @@ Example usage:
 Any command can be run whether they are specific to the shell that you are currently using or git commands. These commands are run within the context of each child git repository.
 For eg, to get the git status of all git repos, I run:
 
+```bash
 run_all git status
+```
 
 To clean all git repos, I run:
+```bash
 run_all git clean -fxd
+```
 
 To run the git remote prune command, I run:
+```bash
 run_all git remote prune origin
+```
 
 and so on (you get the idea)
