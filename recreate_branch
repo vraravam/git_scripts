@@ -10,4 +10,4 @@ branches = `git branch`.split("\n")
 current_branch = branches.detect{|l| l =~ /^\*/}.gsub("\* ", "")
 raise "Should run this only when in master" if current_branch != 'master'
 
-system("git branch -la && git branch -D #{branch_to_recreate} && git push origin :#{branch_to_recreate} && git branch -la && git branch #{branch_to_recreate} && git push origin #{branch_to_recreate} && git branch -d #{branch_to_recreate} && git co #{branch_to_recreate} && git co master")
+system("git branch -la && git branch -D #{branch_to_recreate} && git push origin :#{branch_to_recreate} && git branch -la && git branch #{branch_to_recreate} && git push origin #{branch_to_recreate} && git branch -d #{branch_to_recreate} && git co #{branch_to_recreate} && git co -")
