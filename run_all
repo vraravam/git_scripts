@@ -1,20 +1,52 @@
 #!/bin/bash
 
-DIRECTORIES=`ls -1d */.git/ | cut -d/ -f1`
-TOTAL_COUNT=`echo $DIRECTORIES | wc -w`
+# This script will find all git repositories within the specified 'FOLDER' (defaults to current dir)
+# and for a minimum depth of 'MINDEPTH' (optional; defaults to 1) and a maximum depth of 'MAXDEPTH'
+# (optional; defaults to 3); and then runs the specified commands in each of those git repos.
+# This script is not limited to only running 'git' commands!
+#
+# For eg:
+#    FOLDER=dev MINDEPTH=2 run_all git status
+#    FOLDER=dev MINDEPTH=2 run_all git branch -vv
+#    FOLDER=dev MINDEPTH=2 run_all git remote -vv
+#    FOLDER=dev MINDEPTH=2 run_all ls -l
+
+pushd() {
+  command pushd "$@" > /dev/null
+}
+
+popd() {
+  command popd "$@" > /dev/null
+}
+
+MINDEPTH=${MINDEPTH:-1}
+MAXDEPTH=${MAXDEPTH:-3}
+FOLDER=${FOLDER:-.}
 
 date
 
-count=1
+tput setaf 3  # bright green text
+echo "Finding git repos starting in folder '$FOLDER' for a min depth of $MINDEPTH and max depth of $MAXDEPTH"
+tput sgr0 # go back to normal text
+
+DIRECTORIES=`find $FOLDER -name ".git" -type d -mindepth $MINDEPTH -maxdepth $MAXDEPTH | sed "s/\.\///" | sed "s/\/\.git//" | sort`
+# Note: This line will also remove '.git' from the current folder if the current folder is itself a git repo
+DIRECTORIES=`echo $DIRECTORIES | sed "s/\.git//"`
+# Note: This line will remove my repos in '~/Library' and '~/.vscode' folders
+DIRECTORIES=`echo $DIRECTORIES | sed "s/\.vscode//" | sed "s/Library//"`
+
+TOTAL_COUNT=`echo $DIRECTORIES | wc -w`
+
+COUNT=1
 for dir in $DIRECTORIES; do
   if [ -d $dir -a ! -h $dir ]; then
-    tput setf 4
-    echo ">>>>>>>>>>>>>>>>>>>>> [$count of $TOTAL_COUNT]  "$*" (in $dir) <<<<<<<<<<<<<<<<<<<<"
-    tput sgr0
-    cd $dir
-    bash -c "$*"
-    cd ..
-    let count=count+1
+    tput setaf 2  # bright green text
+    echo ">>>>>>>>>>>>>>>>>>>>> [$COUNT of $TOTAL_COUNT] "$*" (in $dir) <<<<<<<<<<<<<<<<<<<<"
+    tput sgr0 # go back to normal text
+    pushd $dir
+    bash -l -c "$*"
+    popd
+    let COUNT=COUNT+1
   fi
 done
 
