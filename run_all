@@ -29,7 +29,7 @@ tput setaf 3  # bright green text
 echo "Finding git repos starting in folder '$FOLDER' for a min depth of $MINDEPTH and max depth of $MAXDEPTH"
 tput sgr0 # go back to normal text
 
-DIRECTORIES=`find $FOLDER -name ".git" -type d -mindepth $MINDEPTH -maxdepth $MAXDEPTH | sed "s/\.\///" | sed "s/\/\.git//" | sort`
+DIRECTORIES=`find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | sed "s/\.\///" | sed "s/\/\.git//" | sort`
 # Note: This line will also remove '.git' from the current folder if the current folder is itself a git repo
 DIRECTORIES=`echo $DIRECTORIES | sed "s/\.git//"`
 # Note: This line will remove my repos in '~/Library' and '~/.vscode' folders
