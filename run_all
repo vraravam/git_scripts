@@ -44,7 +44,7 @@ for dir in $DIRECTORIES; do
     echo ">>>>>>>>>>>>>>>>>>>>> [$COUNT of $TOTAL_COUNT] "$*" (in $dir) <<<<<<<<<<<<<<<<<<<<"
     tput sgr0 # go back to normal text
     pushd $dir
-    bash -l -c "$*"
+    bash -c "$*"
     popd
     let COUNT=COUNT+1
   fi
