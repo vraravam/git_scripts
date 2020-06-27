@@ -29,12 +29,12 @@ FOLDER=${FOLDER:-.}
 
 date
 
-tput setaf 3  # bright green text
+tput setaf 3 2>/dev/null  # bright green text
 echo "Finding git repos starting in folder '$FOLDER' for a min depth of $MINDEPTH and max depth of $MAXDEPTH"
 if [ "$FILTER" != "" ]; then
   echo "Filtering with: $FILTER"
 fi
-tput sgr0 # go back to normal text
+tput sgr0 2>/dev/null # go back to normal text
 
 DIRECTORIES=`find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | GREP_OPTIONS= grep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
 
@@ -50,9 +50,9 @@ TOTAL_COUNT=`echo $DIRECTORIES | wc -w`
 COUNT=1
 for dir in $DIRECTORIES; do
   if [ -d $dir -a ! -h $dir ]; then
-    tput setaf 2  # bright green text
+    tput setaf 2 2>/dev/null  # bright green text
     echo ">>>>>>>>>>>>>>>>>>>>> [$COUNT of $TOTAL_COUNT] "$*" (in $dir) <<<<<<<<<<<<<<<<<<<<"
-    tput sgr0 # go back to normal text
+    tput sgr0 2>/dev/null # go back to normal text
     pushd $dir
     bash -c "$*"
     popd
