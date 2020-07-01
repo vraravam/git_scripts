@@ -38,11 +38,13 @@ tput sgr0 2>/dev/null # go back to normal text
 
 DIRECTORIES=`find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | GREP_OPTIONS= grep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
 
-if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]]; then
+if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
   # Note: This line will also remove '.git' from the current folder if the current folder is itself a git repo
-  DIRECTORIES=`echo $DIRECTORIES | sed "s/\.git//"`
-  # Note: This line will remove my repos in '~/Library' and '~/.vscode' folders
-  DIRECTORIES=`echo $DIRECTORIES | sed "s/\.vscode//" | sed "s/Library//"`
+  DIRECTORIES=`echo $DIRECTORIES | sed "s|$HOME\ | |" | sed "s|$HOME\/\ | |" | sed "s/\.git//"`
+  # Note: This line will remove my repo in '~/Library' folder
+  DIRECTORIES=`echo $DIRECTORIES | sed "s|$HOME\/Library\ ||" | sed "s|Library\ ||"`
+  # Note: This line will remove my repo in '~/.vscode' folder
+  DIRECTORIES=`echo $DIRECTORIES | sed "s|$HOME\/\.vscode\ ||" | sed "s|.vscode\ ||"`
 fi
 
 TOTAL_COUNT=`echo $DIRECTORIES | wc -w`
