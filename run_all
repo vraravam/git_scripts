@@ -36,7 +36,7 @@ if [ "$FILTER" != "" ]; then
 fi
 tput sgr0 2>/dev/null # go back to normal text
 
-DIRECTORIES=`find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | GREP_OPTIONS= grep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
+DIRECTORIES=`GREP_OPTIONS= ; find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | grep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
 
 if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
   # Note: This line will also remove '.git' from the current folder if the current folder is itself a git repo

@@ -1,16 +1,20 @@
 #!/usr/bin/env ruby
 
+def help
+  puts "Usage: #{$0} [-v] <tag>"
+  puts " -v   Turn on/off the verbose flag (default: off)"
+  puts " tag  Required parameter specifying which tag to recreate - should be different from the current one"
+  exit(-1)
+end
+
 verbose = ARGV.delete("-v")
 tag_to_recreate = ARGV.first
-raise "Should specify tag to recreate: usage: #{$0} [-v] <tag>" if tag_to_recreate.nil?
+help if tag_to_recreate.nil?
 
-require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
-
-branches = `git branch`.split("\n")
-current_branch = branches.detect{|l| l =~ /^\*/}.gsub("\* ", "")
+current_branch = `git rev-parse --abbrev-ref HEAD`.chomp
 raise "Should not run this when in master" if current_branch == 'master'
 
-tags = `git tag -l`.split("\n")
+tags = `git fetch --tags; git tag -l`.split("\n")
 tags_for_current_branch = tags.select{|l| l =~ /^#{current_branch}/}
 raise "Cannot recreate a non-existent tag: #{tag_to_recreate.inspect}" unless tags_for_current_branch.include?(tag_to_recreate)
 
@@ -21,8 +25,10 @@ diff_exists = `git diff #{current_branch}..#{latest_tag}`
 puts diff_exists
 
 if !diff_exists.empty?
+  require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
+
   system("git tag -d #{latest_tag}")
-  system("git push origin :refs/tags/#{latest_tag}")
-  system("git tag #{latest_tag}")
+  system("git push -f origin :refs/tags/#{latest_tag}")
+  system("git tag -f #{latest_tag}")
   system("git push --tags")
 end

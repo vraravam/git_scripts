@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+
+def help
+  puts "Usage: #{$0} [-v] <branch>"
+  puts " -v      Turn on/off the verbose flag (default: off)"
+  puts " branch  Required parameter specifying which branch to recreate - should be different from the current one"
+  exit(-1)
+end
+
+verbose = ARGV.delete("-v")
+branch_to_recreate = ARGV.first
+help if branch_to_recreate.nil?
+
+current_branch = `git rev-parse --abbrev-ref HEAD`.chomp
+raise "Should not run this when the current local branch is same one needing to be recreated" if current_branch == branch_to_recreate
+
+remote_branches = `git branch -r --list '*#{branch_to_recreate}*'`
+raise "Specified branch (#{branch_to_recreate}) does not exist in remote" if remote_branches.empty?
+
+require File.expand_path('./kernel_override', File.dirname(__FILE__)) unless verbose.nil?
+
+system("git branch -la && git branch -D #{branch_to_recreate} && git checkout #{branch_to_recreate}")
