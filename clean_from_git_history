@@ -7,6 +7,8 @@ set -o errexit
 # it, cd to your repository's root and then run the script with a list of paths
 # you want to delete, e.g., git-delete-history path1 path2
 
+# Note: There are other gists, etc that can help achieve the same. One such script can be found here: https://gist.github.com/kevinwright/a3d2efe2ce6ca48825ce - not sure which is more "up-to-date" and can be better used for solving your problem. YMMV
+
 if [ $# -eq 0 ]; then
   echo "Usage: $0 <files to be deleted>"
   echo "  You can specify multiple files to be deleted - just separate them with a space in between"
