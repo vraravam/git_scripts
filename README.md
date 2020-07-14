@@ -5,7 +5,7 @@ These are some scripts that I use constantly when dealing with multiple git repo
 
 ## run_all
 ----------
-This script is typically run from the common parent directory. Currently, they are hardcoded to -only peek into the first level of child directories-, find all directories that are git repositories and run the specified commands.
+This script is typically run from the common parent directory. Currently, they are hardcoded to -only peek into the first level of child directories-, find all sub-directories that are git repositories and run the specified commands.
 
 With the latest update, the `run_all` script can be configured to run against any level of subdirectory. Examples:
 ```bash

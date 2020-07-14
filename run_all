@@ -2,7 +2,7 @@
 
 if [ "$1" = "-h" ]; then
   echo "This script will find all git repositories within the specified 'FOLDER' (defaults to current dir)"
-  echo "filtered by 'FILTER' (defaults to empty string) and for a minimum depth of 'MINDEPTH'"
+  echo "filtered by 'FILTER' (defaults to empty string; accepts regex) and for a minimum depth of 'MINDEPTH'"
   echo "(optional; defaults to 1) and a maximum depth of 'MAXDEPTH' (optional; defaults to 3);"
   echo "and then runs the specified commands in each of those git repos."
   echo "This script is not limited to only running 'git' commands!"
@@ -12,6 +12,7 @@ if [ "$1" = "-h" ]; then
   echo "   FOLDER=dev MINDEPTH=2 run_all git branch -vv"
   echo "   FOLDER=dev MINDEPTH=2 run_all ls -l"
   echo "   FILTER=oss run_all ls -l"
+  echo "   FILTER=asdf|zsh run_all git fo"
   exit -1
 fi
 
@@ -36,7 +37,7 @@ if [ "$FILTER" != "" ]; then
 fi
 tput sgr0 2>/dev/null # go back to normal text
 
-DIRECTORIES=`GREP_OPTIONS= ; find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | grep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
+DIRECTORIES=`GREP_OPTIONS= ; find $FOLDER -mindepth $MINDEPTH -maxdepth $MAXDEPTH -name ".git" -type d | egrep "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort`
 
 if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
   # Note: This line will also remove '.git' from the current folder if the current folder is itself a git repo
