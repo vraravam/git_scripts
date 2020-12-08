@@ -38,19 +38,17 @@ if [ "$FILTER" != "" ]; then
 fi
 tput sgr0 2>/dev/null # go back to normal text
 
-# shellcheck disable=SC2034
-DIRECTORIES=$(GREP_OPTIONS= ; find "$FOLDER" -mindepth "$MINDEPTH" -maxdepth "$MAXDEPTH" -name ".git" -type d 2>/dev/null | grep -iE "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort)
+DIRECTORIES=$(find "$FOLDER" -mindepth "$MINDEPTH" -maxdepth "$MAXDEPTH" -name ".git" -type d 2>/dev/null | GREP_OPTIONS='' grep -iE "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort)
 
+# I have some special repos that should not show up in this list for processing - removing them
 if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
-  # Note: Leave the trailing space for matching in here; Also, do not double-quote since it fails to remove the $HOME folder
-  # shellcheck disable=SC2086
-  DIRECTORIES=$(echo $DIRECTORIES | sed "s|$HOME\ ||" | sed "s|$HOME\/\ ||")
+  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^\.git$||" | sed -E "s|^$HOME$||" | sed -E "s|^$HOME\/$||")
   # Note: This line will remove my repo in '~/Library' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed "s|$HOME\/Library||" | sed "s|Library||")
+  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/Library$||" | sed -E "s|Library$||")
   # Note: This line will remove my repo in '~/.vscode' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed "s|$HOME\/\.vscode||" | sed "s|.vscode||")
+  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/\.vscode$||" | sed -E "s|\.vscode$||")
   # Note: This line will remove my repo in '~/tmp' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed "s|$HOME\/tmp||" | sed "s|tmp||")
+  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/tmp$||" | sed -E "s|tmp$||")
 fi
 
 TOTAL_COUNT=$(echo "$DIRECTORIES" | wc -w)

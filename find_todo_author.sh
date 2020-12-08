@@ -6,7 +6,7 @@
 set -e
 
 todo_list() {
-  GREP_OPTIONS= grep -InR 'TODO' ./* \
+  GREP_OPTIONS='' grep -InR 'TODO' ./* \
     --exclude-dir=node_modules \
     --exclude-dir=public \
     --exclude-dir=vendor \
@@ -36,7 +36,7 @@ message() {
 }
 
 parse_line() {
-  printf "%s" "$todo" | cut -d':' -f $1
+  printf "%s" "$todo" | cut -d':' -f "$1"
 }
 
 while IFS= read -r todo; do
