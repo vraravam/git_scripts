@@ -44,7 +44,7 @@ DIRECTORIES=$(find "$FOLDER" -mindepth "$MINDEPTH" -maxdepth "$MAXDEPTH" -name "
 if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
   DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^\.git$||" | sed -E "s|^$HOME$||" | sed -E "s|^$HOME\/$||")
   # Note: This line will remove my repo in '~/Library' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/Library$||" | sed -E "s|Library$||")
+  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/Library||" | sed -E "s|Library$||")
   # Note: This line will remove my repo in '~/.vscode' folder
   DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/\.vscode$||" | sed -E "s|\.vscode$||")
   # Note: This line will remove my repo in '~/tmp' folder
