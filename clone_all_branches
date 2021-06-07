@@ -5,6 +5,6 @@
 
 # Note: Assumes that the remote's name is 'origin' and the default branch's name is 'master'
 
-for branch in $(GREP_OPTIONS='' ; git branch -a | grep 'remotes/origin' | egrep -v '(HEAD|master)'); do
+for branch in $(git branch -a | grep 'remotes/origin' | egrep -v '(HEAD|master)'); do
   git branch --track ${branch##*/} $branch
 done

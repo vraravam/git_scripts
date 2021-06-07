@@ -6,7 +6,7 @@
 set -e
 
 todo_list() {
-  GREP_OPTIONS='' grep -InR 'TODO' ./* \
+  grep -InR 'TODO' ./* \
     --exclude-dir=node_modules \
     --exclude-dir=public \
     --exclude-dir=vendor \
