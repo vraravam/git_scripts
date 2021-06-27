@@ -16,9 +16,9 @@ With the latest update, the `run_all` script can be configured to run against an
   run_all find . -iname patch.txt --exec rm -rfv {} \;    # find all files with the name 'patch.txt'
 ```
 
-You can also control the starting (parent) folder by specifying the `FOLDER` env var, and also sumultaneously control the depth using the `MINDEPTH` and `MAXDEPTH` env vars. So, for eg, to search in multuiple nested folders starting at `~/dev`, you can use the following command:
+You can also control the starting (parent) folder by specifying the `FOLDER` env var, the filter for mathing either the path and/or the name of the folders to be processed using `FILTER` and also sumultaneously control the depth using the `MINDEPTH` and `MAXDEPTH` env vars. So, for eg, to search in multuiple nested folders starting at `~/dev`, you can use the following command:
 ```bash
-  FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 run_all git status
+  FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 FILTER=oss run_all git status
   FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 run_all git fetch
 ```
 To see more features based on env vars (and a more complete description), please see [run_all](run_all)
