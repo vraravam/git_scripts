@@ -17,11 +17,11 @@ if [ "$1" = "-h" ]; then
 fi
 
 pushd() {
-  command pushd "$@" > /dev/null
+  command pushd "$@" > /dev/null || return
 }
 
 popd() {
-  command popd > /dev/null
+  command popd > /dev/null || return
 }
 
 MINDEPTH=${MINDEPTH:-1}
@@ -32,34 +32,34 @@ FILTER=${FILTER:-}
 date
 
 tput setaf 3 2>/dev/null  # bright green text
-echo "Finding git repos starting in folder '$FOLDER' for a min depth of $MINDEPTH and max depth of $MAXDEPTH"
-if [ "$FILTER" != "" ]; then
-  echo "Filtering with: $FILTER"
+echo "Finding git repos starting in folder '${FOLDER}' for a min depth of ${MINDEPTH} and max depth of ${MAXDEPTH}"
+if [ "${FILTER}" != "" ]; then
+  echo "Filtering with: ${FILTER}"
 fi
 tput sgr0 2>/dev/null # go back to normal text
 
 # TODO: Tried to use -regex to filter out folders, but "run from any direcctory for any combination of FILTER and FOLDER is not working"
-# \( ! -regex "$HOME/.git" \) \( ! -regex "$HOME/Library/.git" \) \( ! -regex "$HOME/.vscode/.git" \) \( ! -regex "$HOME/tmp/.git" \)
-DIRECTORIES=$(find "$FOLDER" -mindepth "$MINDEPTH" -maxdepth "$MAXDEPTH" -name ".git" -type d 2>/dev/null | grep -iE "$FILTER" | sed "s/\.\///" | sed "s/\/\.git//" | sort)
+# \( ! -regex "${HOME}/.git" \) \( ! -regex "${HOME}/Library/.git" \) \( ! -regex "${HOME}/.vscode/.git" \) \( ! -regex "${HOME}/tmp/.git" \)
+DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d 2>/dev/null | grep -iE "${FILTER}" | sed "s/\.\///" | sed "s/\/\.git//" | sort)
 
 # I have some special repos that should not show up in this list for processing - removing them
-if [[ "$FOLDER" == "." ]] && [[ "$PWD" == "$HOME" ]] || [[ "$FOLDER" == "$HOME" ]]; then
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^\.git$||" | sed -E "s|^$HOME$||" | sed -E "s|^$HOME\/$||")
+if [[ "${FOLDER}" == "." ]] && [[ "$PWD" == "${HOME}" ]] || [[ "${FOLDER}" == "${HOME}" ]]; then
+  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^\.git$||" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
   # Note: This line will remove my repo in '~/Library' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/Library||" | sed -E "s|Library$||")
+  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/Library||" | sed -E "s|Library$||")
   # Note: This line will remove my repo in '~/.vscode' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/\.vscode$||" | sed -E "s|\.vscode$||")
+  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/\.vscode$||" | sed -E "s|\.vscode$||")
   # Note: This line will remove my repo in '~/tmp' folder
-  DIRECTORIES=$(echo "$DIRECTORIES" | sed -E "s|^$HOME\/tmp$||" | sed -E "s|tmp$||")
+  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/tmp$||" | sed -E "s|tmp$||")
 fi
 
-TOTAL_COUNT=$(echo "$DIRECTORIES" | wc -w)
+TOTAL_COUNT=$(echo "${DIRECTORIES}" | wc -w)
 
 COUNT=1
-for dir in $DIRECTORIES; do
+for dir in ${DIRECTORIES}; do
   if [ -d "$dir" ] && [ ! -h "$dir" ]; then
     tput setaf 2 2>/dev/null  # bright green text
-    echo ">>>>>>>>>>>>>>>>>>>>> [$COUNT of $TOTAL_COUNT] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<"
+    echo ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<"
     tput sgr0 2>/dev/null # go back to normal text
     pushd "$dir" || return
     bash -c "$*"
