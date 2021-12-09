@@ -64,7 +64,7 @@ for dir in ${DIRECTORIES}; do
     pushd "$dir" || return
     bash -c "$*"
     popd || return
-    (( COUNT++ )) || true
+    COUNT=$((COUNT + 1)) || true
   fi
 done
 
