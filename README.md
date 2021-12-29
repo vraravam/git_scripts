@@ -25,6 +25,8 @@ To see more features based on env vars (and a more complete description), please
 
 Note: Any command can be run (whether they are specific to the shell that you are currently using) or git commands. These commands are run within the context of each child git repository.
 
+![run_all in action](./images/Screenshot.png "Screenshot of run_all")
+
 ## clean_from_git_history
 ----------
 Script to permanently delete files/folders from your git repository. To use it, cd to your repository's root and then run the script with a list of paths you want to delete, e.g., `git-delete-history path1 path2`
