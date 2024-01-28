@@ -40,17 +40,14 @@ tput sgr0 2>/dev/null # go back to normal text
 
 # TODO: Tried to use -regex to filter out folders, but "run from any direcctory for any combination of FILTER and FOLDER is not working"
 # \( ! -regex "${HOME}/.git" \) \( ! -regex "${HOME}/Library/.git" \) \( ! -regex "${HOME}/.vscode/.git" \) \( ! -regex "${HOME}/tmp/.git" \)
-DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d 2>/dev/null | grep -iE "${FILTER}" | sed "s/\.\///" | sed "s/\/\.git//" | sort)
+DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d -exec dirname {} \; 2>/dev/null | grep -iE "${FILTER}" | sort)
 
 # I have some special repos that should not show up in this list for processing - removing them
 if [[ "${FOLDER}" == "." ]] && [[ "$PWD" == "${HOME}" ]] || [[ "${FOLDER}" == "${HOME}" ]]; then
-  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^\.git$||" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
-  # Note: This line will remove my repo in '~/Library' folder
-  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/Library||" | sed -E "s|Library$||")
-  # Note: This line will remove my repo in '~/.vscode' folder
-  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/\.vscode$||" | sed -E "s|\.vscode$||")
-  # Note: This line will remove my repo in '~/tmp' folder
-  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}\/tmp$||" | sed -E "s|tmp$||")
+  # Note: This line will remove my repo in '~' folder
+  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
+  # Note: This line will remove any entry with 'tmp' or 'Library/Cache' in the path
+  DIRECTORIES=$(echo "${DIRECTORIES}" | grep -v tmp | grep -v "Library/Cache")
 fi
 
 TOTAL_COUNT=$(echo "${DIRECTORIES}" | wc -w)
