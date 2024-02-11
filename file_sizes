@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 #set -x
 
 # @see http://stevelorek.com/how-to-shrink-a-git-repository.html
