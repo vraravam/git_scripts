@@ -57,7 +57,7 @@ DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -
 # I have some special repos that should not show up in this list for processing - removing them
 if [[ "${FOLDER}" == "." ]] && [[ "$PWD" == "${HOME}" ]] || [[ "${FOLDER}" == "${HOME}" ]]; then
   # Note: This line will remove my repo in '~' folder
-  DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
+  # DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
   # Note: This line will remove any entry with 'tmp' or 'Library/Cache' in the path
   DIRECTORIES=$(echo "${DIRECTORIES}" | grep -v -e tmp -e "Library/Cache")
 fi
