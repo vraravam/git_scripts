@@ -16,14 +16,6 @@ if [ "$1" = "-h" ]; then
   exit 1
 fi
 
-pushd() {
-  command pushd "$@" > /dev/null || return
-}
-
-popd() {
-  command popd > /dev/null || return
-}
-
 enable_bright_green_text_color() {
   tput setaf 2 2>/dev/null
 }
