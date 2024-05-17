@@ -1,6 +1,27 @@
 #!/usr/bin/env bash
 
+blue() {
+  printf "\033[94m$1\033[0m"
+}
+
+cyan() {
+  printf "\033[96m$1\033[0m"
+}
+
+green() {
+  printf "\033[1;32m$1\033[0m"
+}
+
+red() {
+  printf "\033[31m$1\033[0m"
+}
+
+yellow() {
+  printf "\033[33m$1\033[0m"
+}
+
 if [ "$1" = "-h" ]; then
+  echo $(red "** Usage **")
   echo "This script will find all git repositories within the specified 'FOLDER' (defaults to current dir)"
   echo "filtered by 'FILTER' (defaults to empty string; accepts regex) and for a minimum depth of 'MINDEPTH'"
   echo "(optional; defaults to 1) and a maximum depth of 'MAXDEPTH' (optional; defaults to 3);"
@@ -16,18 +37,6 @@ if [ "$1" = "-h" ]; then
   exit 1
 fi
 
-enable_bright_green_text_color() {
-  tput setaf 2 2>/dev/null
-}
-
-enable_bright_yellow_text_color() {
-  tput setaf 3 2>/dev/null
-}
-
-enable_normal_text_color() {
-  tput sgr0 2>/dev/null
-}
-
 MINDEPTH=${MINDEPTH:-1}
 MAXDEPTH=${MAXDEPTH:-3}
 FOLDER=${FOLDER:-.}
@@ -35,12 +44,10 @@ FILTER=${FILTER:-}
 
 date
 
-enable_bright_yellow_text_color
-echo "Finding git repos starting in folder '${FOLDER}' for a min depth of ${MINDEPTH} and max depth of ${MAXDEPTH}"
+echo $(yellow "Finding git repos starting in folder '${FOLDER}' for a min depth of ${MINDEPTH} and max depth of ${MAXDEPTH}")
 if [ "${FILTER}" != "" ]; then
-  echo "Filtering with: ${FILTER}"
+  echo $(yellow "Filtering with: ${FILTER}")
 fi
-enable_normal_text_color
 
 # TODO: Tried to use -regex to filter out folders, but "run from any direcctory for any combination of FILTER and FOLDER is not working"
 # \( ! -regex "${HOME}/.git" \) \( ! -regex "${HOME}/Library/.git" \) \( ! -regex "${HOME}/.vscode/.git" \) \( ! -regex "${HOME}/tmp/.git" \)
@@ -59,9 +66,7 @@ TOTAL_COUNT=$(echo "${DIRECTORIES}" | wc -w)
 COUNT=1
 for dir in ${DIRECTORIES}; do
   if [ -d "$dir" ] && [ ! -h "$dir" ]; then
-    enable_bright_green_text_color
-    echo ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<"
-    enable_normal_text_color
+    echo $(green ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<")
     bash -c "cd $dir; $*"
     COUNT=$((COUNT + 1))
   fi
