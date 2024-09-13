@@ -51,7 +51,7 @@ fi
 
 # TODO: Tried to use -regex to filter out folders, but "run from any direcctory for any combination of FILTER and FOLDER is not working"
 # \( ! -regex "${HOME}/.git" \) \( ! -regex "${HOME}/Library/.git" \) \( ! -regex "${HOME}/.vscode/.git" \) \( ! -regex "${HOME}/tmp/.git" \)
-DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d -exec dirname {} \; 2>/dev/null | grep -iE "${FILTER}" | sort)
+DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d -prune -exec dirname {} \; 2>/dev/null | grep -iE "${FILTER}" | sort)
 
 # I have some special repos that should not show up in this list for processing - removing them
 if [[ "${FOLDER}" == "." ]] && [[ "$PWD" == "${HOME}" ]] || [[ "${FOLDER}" == "${HOME}" ]]; then
