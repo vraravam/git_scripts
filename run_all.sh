@@ -1,39 +1,52 @@
 #!/usr/bin/env bash
 
+colorize() {
+  printf "\x1b[${1}m"
+}
+
+NC=$(colorize '0') # No Color
+RED=$(colorize '0;31')
+GREEN=$(colorize '0;32')
+YELLOW=$(colorize '1;33')
+BLUE=$(colorize '0;34')
+CYAN=$(colorize '0;36')
+
 blue() {
-  printf "\033[94m$1\033[0m"
+  printf "${BLUE}${1}${NC}"
 }
 
 cyan() {
-  printf "\033[96m$1\033[0m"
+  printf "${CYAN}${1}${NC}"
 }
 
 green() {
-  printf "\033[1;32m$1\033[0m"
+  printf "${GREEN}${1}${NC}"
 }
 
 red() {
-  printf "\033[31m$1\033[0m"
+  printf "${RED}${1}${NC}"
 }
 
 yellow() {
-  printf "\033[33m$1\033[0m"
+  printf "${YELLOW}${1}${NC}"
 }
 
 if [ "$1" = "-h" ]; then
-  echo $(red "** Usage **")
-  echo "This script will find all git repositories within the specified 'FOLDER' (defaults to current dir)"
-  echo "filtered by 'FILTER' (defaults to empty string; accepts regex) and for a minimum depth of 'MINDEPTH'"
-  echo "(optional; defaults to 1) and a maximum depth of 'MAXDEPTH' (optional; defaults to 3);"
-  echo "and then runs the specified commands in each of those git repos."
-  echo "This script is not limited to only running 'git' commands!"
-  echo ""
-  echo "For eg:"
-  echo "   FOLDER=dev MINDEPTH=2 run_all.sh git status"
-  echo "   FOLDER=dev MINDEPTH=2 run_all.sh git branch -vv"
-  echo "   FOLDER=dev MINDEPTH=2 run_all.sh ls -l"
-  echo "   FILTER=oss run_all.sh ls -l"
-  echo "   FILTER='asdf|zsh' run_all.sh git fo"
+  cat << EOF
+$(red "** Usage **")
+This script will find all git repositories within the specified 'FOLDER' (defaults to current dir)
+filtered by 'FILTER' (defaults to empty string; accepts regex) and for a minimum depth of 'MINDEPTH'
+(optional; defaults to 1) and a maximum depth of 'MAXDEPTH' (optional; defaults to 3);
+and then runs the specified commands in each of those git repos.
+This script is not limited to only running 'git' commands!
+
+For eg:
+  FOLDER=dev MINDEPTH=2 run_all.sh git status
+  FOLDER=dev MINDEPTH=2 run_all.sh git branch -vv
+  FOLDER=dev MINDEPTH=2 run_all.sh ls -l
+  FILTER=oss run_all.sh ls -l
+  FILTER='asdf|zsh' run_all.sh git fo
+EOF
   exit 1
 fi
 
@@ -42,34 +55,40 @@ MAXDEPTH=${MAXDEPTH:-3}
 FOLDER=${FOLDER:-.}
 FILTER=${FILTER:-}
 
-date
+start_time=$(date +%s)
+echo "Script started at: $(date)"
 
 echo $(yellow "Finding git repos starting in folder '${FOLDER}' for a min depth of ${MINDEPTH} and max depth of ${MAXDEPTH}")
-if [ "${FILTER}" != "" ]; then
-  echo $(yellow "Filtering with: ${FILTER}")
-fi
+[ "${FILTER}" != '' ] && echo $(yellow "Filtering with: ${FILTER}")
 
-# TODO: Tried to use -regex to filter out folders, but "run from any direcctory for any combination of FILTER and FOLDER is not working"
-# \( ! -regex "${HOME}/.git" \) \( ! -regex "${HOME}/Library/.git" \) \( ! -regex "${HOME}/.vscode/.git" \) \( ! -regex "${HOME}/tmp/.git" \)
-DIRECTORIES=$(find "${FOLDER}" -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}" -name ".git" -type d -prune -exec dirname {} \; 2>/dev/null | grep -iE "${FILTER}" | sort)
+find_cmd=(
+  find "${FOLDER}"
+  -mindepth "${MINDEPTH}" -maxdepth "${MAXDEPTH}"
+  # Exclude specific directory patterns by pruning them
+  \( -path '*/tmp' -o -path '*/Library/Cache' \) -prune
+  # Or (-o), find .git directories, prune them (don't descend), and print their parent directory
+  -o
+  \( -name ".git" -type d -prune -exec dirname {} \; \)
+)
 
-# I have some special repos that should not show up in this list for processing - removing them
-if [[ "${FOLDER}" == "." ]] && [[ "$PWD" == "${HOME}" ]] || [[ "${FOLDER}" == "${HOME}" ]]; then
-  # Note: This line will remove my repo in '~' folder
-  # DIRECTORIES=$(echo "${DIRECTORIES}" | sed -E "s|^${HOME}$||" | sed -E "s|^${HOME}\/$||")
-  # Note: This line will remove any entry with 'tmp' or 'Library/Cache' in the path
-  DIRECTORIES=$(echo "${DIRECTORIES}" | grep -v -e tmp -e "Library/Cache")
-fi
+# Execute find, get parent directory, filter, and sort
+mapfile -t DIR_ARRAY < <("${find_cmd[@]}" 2>/dev/null | grep -iE "${FILTER}" | sort -u)
 
-TOTAL_COUNT=$(echo "${DIRECTORIES}" | wc -w)
+TOTAL_COUNT=${#DIR_ARRAY[@]}
 
 COUNT=1
-for dir in ${DIRECTORIES}; do
+for dir in "${DIR_ARRAY[@]}"; do
   if [ -d "$dir" ] && [ ! -h "$dir" ]; then
     echo $(green ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<")
-    bash -c "cd $dir; $*"
+    # Use a subshell and "$@" for better argument handling and potentially less overhead than 'bash -c'
+    (cd "$dir" && eval "$@")
     COUNT=$((COUNT + 1))
   fi
 done
 
-date
+end_time=$(date +%s)
+echo "Script finished at: $(date)"
+
+duration=$((end_time - start_time))
+duration_formatted=$(printf "%02d:%02d:%02d" $((duration/3600)) $((duration%3600/60)) $((duration%60)))
+echo $(cyan "Total execution time: ${duration_formatted} (HH:MM:SS)")
