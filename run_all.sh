@@ -45,18 +45,18 @@ For eg:
   FOLDER=dev MINDEPTH=2 run_all.sh git branch -vv
   FOLDER=dev MINDEPTH=2 run_all.sh ls -l
   FILTER=oss run_all.sh ls -l
-  FILTER='asdf|zsh' run_all.sh git fo
+  FILTER='oss|zsh|omz' run_all.sh git fo
 EOF
   exit 1
 fi
 
 MINDEPTH=${MINDEPTH:-1}
 MAXDEPTH=${MAXDEPTH:-3}
-FOLDER=${FOLDER:-.}
-FILTER=${FILTER:-}
+FOLDER="${FOLDER:-.}"
+FILTER="${FILTER:-}"
 
 start_time=$(date +%s)
-echo "Script started at: $(date)"
+echo $(cyan "Script started at: $(date)")
 
 echo $(yellow "Finding git repos starting in folder '${FOLDER}' for a min depth of ${MINDEPTH} and max depth of ${MAXDEPTH}")
 [ "${FILTER}" != '' ] && echo $(yellow "Filtering with: ${FILTER}")
@@ -78,16 +78,16 @@ TOTAL_COUNT=${#DIR_ARRAY[@]}
 
 COUNT=1
 for dir in "${DIR_ARRAY[@]}"; do
-  if [ -d "$dir" ] && [ ! -h "$dir" ]; then
-    echo $(green ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '$dir') <<<<<<<<<<<<<<<<<<<<")
+  if [ -d "${dir}" ] && [ ! -h "${dir}" ]; then
+    echo $(green ">>>>>>>>>>>>>>>>>>>>> [${COUNT} of ${TOTAL_COUNT}] '$*' (in '${dir}') <<<<<<<<<<<<<<<<<<<<")
     # Use a subshell and "$@" for better argument handling and potentially less overhead than 'bash -c'
-    (cd "$dir" && eval "$@")
+    (cd "${dir}" && eval "$@")
     COUNT=$((COUNT + 1))
   fi
 done
 
 end_time=$(date +%s)
-echo "Script finished at: $(date)"
+echo $(cyan "Script finished at: $(date)")
 
 duration=$((end_time - start_time))
 duration_formatted=$(printf "%02d:%02d:%02d" $((duration/3600)) $((duration%3600/60)) $((duration%60)))

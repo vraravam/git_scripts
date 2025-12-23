@@ -3,6 +3,8 @@ git_scripts
 
 These are some scripts that I use constantly when dealing with multiple git repositories.
 
+To use, them, simply add the cloned folder to the `PATH` env var!
+
 ## run_all.sh
 ----------
 This script is typically run from the common parent directory.
@@ -17,16 +19,16 @@ With the latest update, the `run_all.sh` script can be configured to run against
   run_all.sh find . -iname patch.txt --exec rm -rfv {} \;    # find all files with the name 'patch.txt'
 ```
 
-You can also control the starting (parent) folder by specifying the `FOLDER` env var, the filter for mathing either the path and/or the name of the folders to be processed using `FILTER` and also sumultaneously control the depth using the `MINDEPTH` and `MAXDEPTH` env vars. So, for eg, to search in multuiple nested folders starting at `~/dev`, you can use the following command:
+You can also control the starting (parent) folder by specifying the `FOLDER` env var, the filter for matching either the path and/or the name of the folders to be processed using `FILTER` (including using regular expressions for the same!) and also sumultaneously control the depth using the `MINDEPTH` and `MAXDEPTH` env vars. So, for eg, to search in multuiple nested folders starting at `~/dev`, you can use the following command:
 
 ```bash
-  FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 FILTER=oss run_all.sh git status
+  FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 FILTER="oss|zsh|omz" run_all.sh git status
   FOLDER=~/dev MINDEPTH=2 MAXDEPTH=5 run_all.sh git fetch
 ```
 
 To see more features based on env vars (and a more complete description), please see [run_all.sh](run_all.sh)
 
-Note: Any command can be run (whether they are specific to the shell that you are currently using) or git commands. These commands are run within the context of each child git repository.
+Note: **Any command can be run** (whether they are specific to the shell that you are currently using) or git commands. These commands are run within the context of each git repository that is matched after applying the filters.
 
 ![run_all.sh in action](./images/Screenshot.png "Screenshot of run_all.sh")
 
